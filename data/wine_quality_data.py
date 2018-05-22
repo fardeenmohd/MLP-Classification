@@ -28,9 +28,21 @@ class WineQualityData:
         self.test_count = int(self.test_percentage * self.number_of_rows)
         self.train_values = self.values[:self.train_count, :]
         self.test_values = self.values[:self.test_count, :]
+
         print("-----Parsed " + self.wine_type.name + " Wine Quality Data-----")
         print("Total input rows demanded: " + number_of_inputs.__str__() + " Total input rows parsed: " +
               (self.train_count + self.test_count).__str__())
         print("Test count: " + (self.test_values.shape[0]).__str__() + " Train count: " +
               (self.train_values.shape[0]).__str__())
         print("Number of Attributes: " + self.number_of_columns.__str__())
+
+        self.train_x = self.train_values[:, : - 1]
+        self.train_y = self.train_values[:, - 1:].reshape(-1, 1)
+        self.test_x = self.test_values[:, : - 1]
+        self.test_y = self.test_values[:, - 1:].reshape(-1, 1)
+
+        print("Test X has " + self.test_x.shape[1].__str__() + " attributes")
+        print("Test Y has " + self.test_y.shape[1].__str__() + " attributes")
+        print("Train X has " + self.train_x.shape[1].__str__() + " attributes")
+        print("Train Y has " + self.train_y.shape[1].__str__() + " attributes")
+
