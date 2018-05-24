@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-import math
 
 DATA_PATH = "../resc/drug_consumption/drug_consumption.data"
 PERSONALITY_END = 12
@@ -31,10 +29,17 @@ class DrugConsumptionData:
 
         self.test_x = self.test_values[:, :PERSONALITY_END]
         self.test_y = self.test_values[:, PERSONALITY_END:]
+
         self.train_x = self.train_values[:, :PERSONALITY_END]
         self.train_y = self.train_values[:, PERSONALITY_END:]
 
-        print("Test X has " + self.test_x.shape[1].__str__() + " attributes")
-        print("Test Y has " + self.test_y.shape[1].__str__() + " attributes")
-        print("Train X has " + self.train_x.shape[1].__str__() + " attributes")
-        print("Train Y has " + self.train_y.shape[1].__str__() + " attributes")
+        self.test_x_attributes = self.test_x.shape[1]
+        self.test_y_attributes = self.test_y.shape[1]
+
+        self.train_x_attributes = self.train_x.shape[1]
+        self.train_y_attributes = self.train_y.shape[1]
+
+        print("Test X has " + self.test_x_attributes.__str__() + " attributes")
+        print("Test Y has " + self.test_y_attributes.__str__() + " attributes")
+        print("Train X has " + self.train_x_attributes.__str__() + " attributes")
+        print("Train Y has " + self.train_y_attributes.__str__() + " attributes")

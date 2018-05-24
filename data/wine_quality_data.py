@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from enum import Enum
 
@@ -41,8 +40,13 @@ class WineQualityData:
         self.test_x = self.test_values[:, : - 1]
         self.test_y = self.test_values[:, - 1:].reshape(-1, 1)
 
-        print("Test X has " + self.test_x.shape[1].__str__() + " attributes")
-        print("Test Y has " + self.test_y.shape[1].__str__() + " attributes")
-        print("Train X has " + self.train_x.shape[1].__str__() + " attributes")
-        print("Train Y has " + self.train_y.shape[1].__str__() + " attributes")
+        self.test_x_attributes = self.test_x.shape[1]
+        self.test_y_attributes = self.test_y.shape[1]
 
+        self.train_x_attributes = self.train_x.shape[1]
+        self.train_y_attributes = self.train_y.shape[1]
+
+        print("Test X has " + self.test_x_attributes.__str__() + " attributes")
+        print("Test Y has " + self.test_y_attributes.__str__() + " attributes")
+        print("Train X has " + self.train_x_attributes.__str__() + " attributes")
+        print("Train Y has " + self.train_y_attributes.__str__() + " attributes")
