@@ -65,25 +65,25 @@ class DataClass:
         self.test_values = self.data[0][:self.test_row_count, :] if data_type == DataType.POKER_HANDS else \
             self.data[:self.test_row_count, :]
 
-        print("-----Parsed " + self.type.value.__str__() + " Data-----")
-        print("Total input rows demanded: " + number_of_inputs.__str__() + " Total input rows parsed: " +
-              (self.train_row_count + self.test_row_count).__str__())
-        print("Test count: " + (self.test_values.shape[0]).__str__() + " Train count: " +
-              (self.train_values.shape[0]).__str__())
-        print("Number of Attributes: " + self.number_of_columns.__str__())
+        # print("-----Parsed " + self.type.value.__str__() + " Data-----")
+        # print("Total input rows demanded: " + number_of_inputs.__str__() + " Total input rows parsed: " +
+        #       (self.train_row_count + self.test_row_count).__str__())
+        # print("Test count: " + (self.test_values.shape[0]).__str__() + " Train count: " +
+        #       (self.train_values.shape[0]).__str__())
+        # print("Number of Attributes: " + self.number_of_columns.__str__())
 
         self.test_x, self.test_y, self.train_x, self.train_y = self.split_x_y_sets()
 
-        print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
-              + self.train_x.shape[1].__str__() + " columns.")
-        print("Train Y has " + self.train_y.shape[0].__str__() + " rows and "
-              + self.train_y.shape[1].__str__() + " columns.")
-        print("Test X has " + self.test_x.shape[0].__str__() + " rows and "
-              + self.test_x.shape[1].__str__() + " columns.")
-        print("Test Y has " + self.test_y.shape[0].__str__() + " rows and "
-              + self.test_y.shape[1].__str__() + " columns.")
-        print(self.test_x)
-        print(self.test_y)
+        # print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
+        #       + self.train_x.shape[1].__str__() + " columns.")
+        # print("Train Y has " + self.train_y.shape[0].__str__() + " rows and "
+        #       + self.train_y.shape[1].__str__() + " columns.")
+        # print("Test X has " + self.test_x.shape[0].__str__() + " rows and "
+        #       + self.test_x.shape[1].__str__() + " columns.")
+        # print("Test Y has " + self.test_y.shape[0].__str__() + " rows and "
+        #       + self.test_y.shape[1].__str__() + " columns.")
+        self.features_x = self.train_x.shape[1]
+        self.features_y = self.train_y.shape[1]
 
     def split_x_y_sets(self):
         if self.type == DataType.DRUG_CONSUMPTION:

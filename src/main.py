@@ -1,7 +1,7 @@
 from data.data_class import DataClass, DataType
+from src.mlp import MultiLayerPerceptron
 
 if __name__ == "__main__":
-    poker_data_class = DataClass(DataType.POKER_HANDS, 5)
-    drug_data_class = DataClass(DataType.DRUG_CONSUMPTION, 5)
-    white_wine_data_class = DataClass(DataType.WHITE_WINE, 5)
-    red_wine_data_class = DataClass(DataType.RED_WINE, 5)
+    poker_mlp = MultiLayerPerceptron(data_type=DataType.POKER_HANDS, data_size=1500)
+    poker_mlp.train()
+    #poker_mlp.test()
