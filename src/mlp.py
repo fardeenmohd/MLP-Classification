@@ -27,9 +27,6 @@ class MultiLayerPerceptron:
         for i in range(self.layers.__len__()):
             print("Layer: " + i.__str__() + " has weights with shape: " + self.layers[i].weights.shape.__str__())
 
-            # dw will hold last change in weights (for momentum)
-            # self.dw = [0, ] * len(self.layers)
-
     def propagate_forward(self, inputs):
         self.layers[0].input = inputs
         for i in range(1, len(self.layers)):
@@ -37,7 +34,7 @@ class MultiLayerPerceptron:
 
         return self.layers[-1].input
 
-    def propagate_backward(self, target, learning_rate: int, momentum: int):
+    def propagate_backward(self, target, learning_rate: int):
         # Compute error on output layer
         deltas = []
         error = target - self.layers[-1].input
@@ -54,13 +51,12 @@ class MultiLayerPerceptron:
             layer = self.layers[i].input
             delta = deltas[i]
             dw = dot(layer.T, delta)
-            self.layers[i].weights += learning_rate * dw  # + momentum*self.dw[i]
-            # self.dw[i] = dw
+            self.layers[i].weights += learning_rate * dw
 
-    def train(self, epochs: int = 1, learning_rate: int = 0.1, momentum: int = 0.1):
+    def train(self, epochs: int = 1, learning_rate: int = 0.1):
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
-            self.propagate_backward(self.data_class.train_y, learning_rate, momentum)
+            self.propagate_backward(self.data_class.train_y, learning_rate)
 
     def test(self):
         output = self.propagate_forward(self.data_class.test_x)
