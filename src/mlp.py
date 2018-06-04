@@ -28,9 +28,12 @@ class MultiLayerPerceptron:
             print("Layer: " + i.__str__() + " has weights with shape: " + self.layers[i].weights.shape.__str__())
 
     def propagate_forward(self, inputs):
-        self.layers[0].input = inputs
+        self.layers[0].input = self.sigmoid(dot(inputs, self.layers[0].weights))
         for i in range(1, len(self.layers)):
-            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.layers[i - 1].weights))
+            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.layers[i].weights))
+
+        for i in range(self.layers.__len__()):
+            print("Layer: " + i.__str__() + " has inputs with shape: " + self.layers[i].input.shape.__str__())
 
         return self.layers[-1].input
 
@@ -42,7 +45,7 @@ class MultiLayerPerceptron:
         deltas.append(delta)
 
         # Compute error on hidden layers
-        for i in range(len(self.layers) - 2, 0, -1):
+        for i in range(len(self.layers) - 1, 0, -1):
             delta = dot(deltas[0], self.layers[i].weights.T) * self.sigmoid_derivative(self.layers[i].input)
             deltas.insert(0, delta)
 
