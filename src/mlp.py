@@ -28,9 +28,9 @@ class MultiLayerPerceptron:
             print("Layer: " + i.__str__() + " has weights with shape: " + self.layers[i].weights.shape.__str__())
 
     def propagate_forward(self, inputs):
-        self.layers[0].input = self.sigmoid(dot(inputs, self.layers[0].weights))
+        self.layers[0].input = inputs
         for i in range(1, len(self.layers)):
-            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.layers[i].weights))
+            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.layers[i - 1].weights))
 
         for i in range(self.layers.__len__()):
             print("Layer: " + i.__str__() + " has inputs with shape: " + self.layers[i].input.shape.__str__())
@@ -59,7 +59,7 @@ class MultiLayerPerceptron:
     def train(self, epochs: int = 1, learning_rate: int = 0.1):
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
-            self.propagate_backward(self.data_class.train_y, learning_rate)
+            # self.propagate_backward(self.data_class.train_y, learning_rate)
 
     def test(self):
         output = self.propagate_forward(self.data_class.test_x)
