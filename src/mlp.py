@@ -3,8 +3,8 @@ from numpy import random, exp, dot
 
 
 class Layer:
-    def __init__(self, number_of_neurons, number_of_inputs_per_neuron):
-        self.weights = 2 * random.random((number_of_inputs_per_neuron, number_of_neurons)) - 1
+    def __init__(self, number_of_neurons):
+        self.number_of_neurons = number_of_neurons
         self.input = None
 
 
@@ -17,22 +17,29 @@ class MultiLayerPerceptron:
         self.hidden_layer_size = hidden_layer_size
         self.layers = []
 
-        self.layers.append(Layer(hidden_layer_size, self.data_class.features_x))  # input layer added
-        for i in range(self.number_of_hidden_layers):
-            if i == self.number_of_hidden_layers - 1:
-                self.layers.append(Layer(self.data_class.features_y, self.hidden_layer_size))
-            else:
-                self.layers.append(Layer(self.hidden_layer_size, hidden_layer_size))
+        self.layers.append(Layer(self.data_class.features_x))  # input layer added
+        for i in range(self.number_of_hidden_layers):          # hidden layers added
+            self.layers.append(Layer(self.hidden_layer_size))
+        self.layers.append(Layer(self.data_class.features_y))  # output layer added
 
-        for i in range(self.layers.__len__()):
-            print("Layer: " + i.__str__() + " has weights with shape: " + self.layers[i].weights.shape.__str__())
+        self.weights = []
+        for i in range(len(self.layers) - 1):
+            self.weights.append(self.create_weights(self.layers[i].number_of_neurons,
+                                                    self.layers[i + 1].number_of_neurons))
+
+        for i in range(len(self.layers)):
+            print("Layer: " + i.__str__() + " has number of neurons: " + self.layers[i].number_of_neurons.__str__())
+
+        for i in range(len(self.layers) - 1):
+            print("Weight matrix between Layer " + i.__str__() + " and " + (i + 1).__str__() +
+                  " has a shape: " + self.weights[i].shape.__str__())
 
     def propagate_forward(self, inputs):
         self.layers[0].input = inputs
         for i in range(1, len(self.layers)):
-            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.layers[i - 1].weights))
+            self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.weights[i - 1]))
 
-        for i in range(self.layers.__len__()):
+        for i in range(len(self.layers)):
             print("Layer: " + i.__str__() + " has inputs with shape: " + self.layers[i].input.shape.__str__())
 
         return self.layers[-1].input
@@ -45,8 +52,8 @@ class MultiLayerPerceptron:
         deltas.append(delta)
 
         # Compute error on hidden layers
-        for i in range(len(self.layers) - 1, 0, -1):
-            delta = dot(deltas[0], self.layers[i].weights.T) * self.sigmoid_derivative(self.layers[i].input)
+        for i in range(len(self.layers) - 2, 0, -1):
+            delta = dot(deltas[0], self.weights[i].T) * self.sigmoid_derivative(self.layers[i].input)
             deltas.insert(0, delta)
 
         # Update weights
@@ -54,12 +61,12 @@ class MultiLayerPerceptron:
             layer = self.layers[i].input
             delta = deltas[i]
             dw = dot(layer.T, delta)
-            self.layers[i].weights += learning_rate * dw
+            self.weights[i] += learning_rate * dw
 
     def train(self, epochs: int = 1, learning_rate: int = 0.1):
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
-            # self.propagate_backward(self.data_class.train_y, learning_rate)
+            self.propagate_backward(self.data_class.train_y, learning_rate)
 
     def test(self):
         output = self.propagate_forward(self.data_class.test_x)
@@ -73,3 +80,7 @@ class MultiLayerPerceptron:
 
     def sigmoid_derivative(self, x):
         return self.sigmoid(x) * (1 - self.sigmoid(x))
+
+    @staticmethod
+    def create_weights(number_of_neurons, number_of_inputs_per_neuron):
+        return 2 * random.random((number_of_neurons, number_of_inputs_per_neuron)) - 1
