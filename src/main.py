@@ -15,7 +15,8 @@ if __name__ == "__main__":
     parser.add_argument('-tp', '--TrainingPercentage', default=0.5, type=int, help='Training Percentage')
     parser.add_argument('-i', '--Iterations', default=10, type=int, help='Number of epochs')
     parser.add_argument('-lr', '--LearningRate', default=1, type=int, help='Learning rate')
-    parser.add_argument('-t', '--Test', default=False, help='Add this argument if you want to test')
+    parser.add_argument('-t', '--Test', default=False, type=bool,
+                        help='Add this argument if you want to test hidden layer size')
     parser.add_argument('-str', '--Start', type=int, default=100, help='Starting point for testing')
     parser.add_argument('-stp', '--Stop', type=int, default=500, help='Stopping point for testing')
     parser.add_argument('-st', '--Step', type=int, default=100, help='Steps for testing')

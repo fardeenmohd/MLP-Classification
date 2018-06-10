@@ -76,7 +76,7 @@ class DataClass:
         self.test_x, self.test_y, self.train_x, self.train_y = self.split_x_y_sets()
 
         self.train_x = preprocessing.normalize(self.train_x)
-        self.test_x = preprocessing.normalize(self.test_x)
+        self.train_y = preprocessing.normalize(self.train_y)
 
         # print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
         #       + self.train_x.shape[1].__str__() + " columns.")
