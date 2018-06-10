@@ -10,7 +10,7 @@ class Layer:
 
 class MultiLayerPerceptron:
     def __init__(self, data_type: DataType = DataType.POKER_HANDS, number_of_hidden_layers: int = 2,
-                 hidden_layer_size: int = 20, data_size: int = 1500, training_percentage: int = 0.8):
+                 hidden_layer_size: int = 100, data_size: int = 1500, training_percentage: int = 0.5):
         self.data_type = data_type
         self.number_of_hidden_layers = number_of_hidden_layers
         self.data_class = DataClass(data_type, data_size, training_percentage)
@@ -18,7 +18,7 @@ class MultiLayerPerceptron:
         self.layers = []
 
         self.layers.append(Layer(self.data_class.features_x))  # input layer added
-        for i in range(self.number_of_hidden_layers):          # hidden layers added
+        for i in range(self.number_of_hidden_layers):  # hidden layers added
             self.layers.append(Layer(self.hidden_layer_size))
         self.layers.append(Layer(self.data_class.features_y))  # output layer added
 
@@ -27,6 +27,7 @@ class MultiLayerPerceptron:
             self.weights.append(self.create_weights(self.layers[i].number_of_neurons,
                                                     self.layers[i + 1].number_of_neurons))
 
+    def print_config(self):
         for i in range(len(self.layers)):
             print("Layer: " + i.__str__() + " has number of neurons: " + self.layers[i].number_of_neurons.__str__())
 
@@ -38,9 +39,6 @@ class MultiLayerPerceptron:
         self.layers[0].input = inputs
         for i in range(1, len(self.layers)):
             self.layers[i].input = self.sigmoid(dot(self.layers[i - 1].input, self.weights[i - 1]))
-
-        for i in range(len(self.layers)):
-            print("Layer: " + i.__str__() + " has inputs with shape: " + self.layers[i].input.shape.__str__())
 
         return self.layers[-1].input
 
@@ -63,7 +61,10 @@ class MultiLayerPerceptron:
             dw = dot(layer.T, delta)
             self.weights[i] += learning_rate * dw
 
-    def train(self, epochs: int = 1, learning_rate: int = 0.1):
+        return (error ** 2).sum()
+
+    def train(self, epochs: int = 10, learning_rate: int = 1):
+        self.print_config()
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
             self.propagate_backward(self.data_class.train_y, learning_rate)
@@ -71,8 +72,10 @@ class MultiLayerPerceptron:
     def test(self):
         output = self.propagate_forward(self.data_class.test_x)
         expected = self.data_class.test_y
-        print("output: " + output.shape.__str__())
-        print("expected: " + expected.shape.__str__())
+
+        error = ((expected - output) ** 2).sum()
+        print("Error after testing with trained weights: " + error.__str__())
+        return error
 
     @staticmethod
     def sigmoid(x):

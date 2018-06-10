@@ -1,5 +1,6 @@
 from enum import Enum
 import pandas as pd
+from sklearn import preprocessing
 
 DATA_PATH_TEST_POKER = "../resc/poker_hands/poker_hands_test.data"
 DATA_PATH_TRAIN_POKER = "../resc/poker_hands/poker_hands_train.data"
@@ -11,10 +12,10 @@ DRUG_DATA_PERSONALITY_END = 12
 
 
 class DataType(Enum):
-    WHITE_WINE = 'White Wine'
-    RED_WINE = 'Red Wine'
-    DRUG_CONSUMPTION = 'Drug Consumption'
-    POKER_HANDS = 'Poker Hands'
+    WHITE_WINE = 'WhiteWine'
+    RED_WINE = 'RedWine'
+    DRUG_CONSUMPTION = 'DrugConsumption'
+    POKER_HANDS = 'PokerHands'
 
 
 def acquire_data(data_type: DataType, number_of_inputs: int):
@@ -73,6 +74,9 @@ class DataClass:
         # print("Number of Attributes: " + self.number_of_columns.__str__())
 
         self.test_x, self.test_y, self.train_x, self.train_y = self.split_x_y_sets()
+
+        self.train_x = preprocessing.normalize(self.train_x)
+        self.test_x = preprocessing.normalize(self.test_x)
 
         # print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
         #       + self.train_x.shape[1].__str__() + " columns.")
