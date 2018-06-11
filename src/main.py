@@ -1,30 +1,37 @@
 from argparse import ArgumentParser
+from enum import Enum
 
 from data.data_class import DataType
 from src.mlp import MultiLayerPerceptron
 import matplotlib.pyplot as plt
+
+
+class TestType(Enum):
+    LAYER_SIZE = 'LayerSize'
+    HIDDEN_LAYERS = 'HiddenLayers'
+    ITERATION = 'Iterations'
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument('-d', '--DataType', default=DataType.DRUG_CONSUMPTION.value, type=str,
                         help='WhiteWine, RedWine, DrugConsumption or PokerHands')
-    parser.add_argument('-ds', '--DataSize', default=500, type=int, help='Size of data')
+    parser.add_argument('-ds', '--DataSize', default=2000, type=int, help='Size of data')
     parser.add_argument('-l', '--HiddenLayers', default=2, type=int, help='Number of hidden layers')
     parser.add_argument('-ls', '--HiddenLayerSize', default=20, type=int, help='Size of the hidden layer')
     parser.add_argument('-tp', '--TrainingPercentage', default=0.8, type=int, help='Training Percentage')
     parser.add_argument('-i', '--Iterations', default=10, type=int, help='Number of epochs')
     parser.add_argument('-lr', '--LearningRate', default=1, type=float, help='Learning rate')
-    parser.add_argument('-t', '--Test', default=False, type=bool,
-                        help='Add this argument if you want to test hidden layer size')
-    parser.add_argument('-str', '--Start', type=int, default=100, help='Starting point for testing')
-    parser.add_argument('-stp', '--Stop', type=int, default=500, help='Stopping point for testing')
-    parser.add_argument('-st', '--Step', type=int, default=100, help='Steps for testing')
+    parser.add_argument('-t', '--Test', type=str, default=None,
+                        help='LayerSize, HiddenLayers or Iterations')
+    parser.add_argument('-str', '--Start', type=int, default=10, help='Starting point for testing')
+    parser.add_argument('-stp', '--Stop', type=int, default=100, help='Stopping point for testing')
+    parser.add_argument('-st', '--Step', type=int, default=5, help='Steps for testing')
 
     arguments = vars(parser.parse_args())
-    print(arguments)
     parser.print_help()
-
+    print(arguments)
     data_arg = arguments['DataType']
     data_type = DataType.POKER_HANDS
 
@@ -38,24 +45,44 @@ if __name__ == "__main__":
         data_type = DataType.POKER_HANDS
 
     if arguments['Test']:
-        sizes = []
-        errors = []
+        test_type = arguments['Test']
+        testing_parameters = []
+        success_rates = []
 
         start = arguments['Start']
         stop = arguments['Stop']
         step = arguments['Step']
 
         for i in range(start, stop, step):
-            sizes.append(i)
+            testing_parameters.append(i)
 
-        for size in sizes:
-            mlp = MultiLayerPerceptron(data_type=data_type, hidden_layer_size=size, data_size=5000)
-            mlp.train()
-            errors.append(mlp.test())
-
-        plt.plot(sizes, errors)
-        plt.ylabel("Errors")
-        plt.xlabel("Hidden Layer Size")
+        if test_type == TestType.HIDDEN_LAYERS.value:
+            for testing_parameter in testing_parameters:
+                mlp = MultiLayerPerceptron(data_type=data_type, number_of_hidden_layers=testing_parameter,
+                                           hidden_layer_size=arguments['HiddenLayerSize'],
+                                           data_size=arguments['DataSize'],
+                                           training_percentage=arguments['TrainingPercentage'])
+                mlp.train(epochs=arguments['Iterations'], learning_rate=arguments['LearningRate'])
+                success_rates.append(mlp.test())
+        elif test_type == TestType.LAYER_SIZE.value:
+            for testing_parameter in testing_parameters:
+                mlp = MultiLayerPerceptron(data_type=data_type, number_of_hidden_layers=arguments['HiddenLayers'],
+                                           hidden_layer_size=testing_parameter,
+                                           data_size=arguments['DataSize'],
+                                           training_percentage=arguments['TrainingPercentage'])
+                mlp.train(epochs=arguments['Iterations'], learning_rate=arguments['LearningRate'])
+                success_rates.append(mlp.test())
+        else:
+            for testing_parameter in testing_parameters:
+                mlp = MultiLayerPerceptron(data_type=data_type, number_of_hidden_layers=arguments['HiddenLayers'],
+                                           hidden_layer_size=arguments['HiddenLayerSize'],
+                                           data_size=arguments['DataSize'],
+                                           training_percentage=arguments['TrainingPercentage'])
+                mlp.train(epochs=testing_parameter, learning_rate=arguments['LearningRate'])
+                success_rates.append(mlp.test())
+        plt.plot(testing_parameters, success_rates)
+        plt.ylabel("Success Rates")
+        plt.xlabel(test_type)
         plt.show()
 
     else:

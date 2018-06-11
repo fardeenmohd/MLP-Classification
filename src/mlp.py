@@ -27,13 +27,21 @@ class MultiLayerPerceptron:
             self.weights.append(self.create_weights(self.layers[i].number_of_neurons,
                                                     self.layers[i + 1].number_of_neurons))
 
+        self.print_config()
+
     def print_config(self):
+        print("----------------Neural-Network-Specification-----------------")
+        print("Data class selected: " + self.data_type.value.__str__())
         for i in range(len(self.layers)):
             print("Layer: " + i.__str__() + " has number of neurons: " + self.layers[i].number_of_neurons.__str__())
 
         for i in range(len(self.layers) - 1):
             print("Weight matrix between Layer " + i.__str__() + " and " + (i + 1).__str__() +
                   " has a shape: " + self.weights[i].shape.__str__())
+
+        print("Number of features used: " + str(self.data_class.features_x) + ", Number of features classified: " + str(
+            self.data_class.features_y))
+        print("-------------------------------------------------------------")
 
     def propagate_forward(self, inputs):
         self.layers[0].input = inputs
@@ -54,24 +62,27 @@ class MultiLayerPerceptron:
             self.weights[i - 1] += learning_rate * grad
 
     def train(self, epochs: int = 10, learning_rate: int = 1):
-        self.print_config()
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
             self.propagate_backward(self.data_class.train_y, learning_rate)
         classified_tr_output = self.classify(self.propagate_forward(self.data_class.train_x))
-        num_tr_matches = 0
+        num_train_matches = 0
         for i in range(self.data_class.train_x.shape[0]):
             if (classified_tr_output[i] == self.data_class.train_y[i]).all():
-                num_tr_matches += 1
-        print(num_tr_matches / self.data_class.train_row_count)
+                num_train_matches += 1
+        success_rate = 100 * (num_train_matches / self.data_class.train_row_count)
+        print("Success rate of your model in training phase is: " + str(success_rate) + "%")
+        return success_rate
 
     def test(self):
-        classified_tr_output = self.classify(self.propagate_forward(self.data_class.test_x))
-        num_tr_matches = 0
+        classified_te_output = self.classify(self.propagate_forward(self.data_class.test_x))
+        num_test_matches = 0
         for i in range(self.data_class.test_x.shape[0]):
-            if (classified_tr_output[i] == self.data_class.test_y[i]).all():
-                num_tr_matches += 1
-        print(num_tr_matches / self.data_class.test_row_count)
+            if (classified_te_output[i] == self.data_class.test_y[i]).all():
+                num_test_matches += 1
+        success_rate = 100 * (num_test_matches / self.data_class.test_row_count)
+        print("Success rate of your model in testing phase is: " + str(success_rate) + "%")
+        return success_rate
 
     @staticmethod
     def sigmoid(x):
