@@ -1,6 +1,7 @@
 from enum import Enum
 import pandas as pd
 from sklearn import preprocessing
+from sklearn.preprocessing import OneHotEncoder
 import numpy
 
 DATA_PATH_TEST_POKER = "../resc/poker_hands/poker_hands_test.data"
@@ -67,19 +68,21 @@ class DataClass:
         self.test_values = self.data[0][:self.test_row_count, :] if data_type == DataType.POKER_HANDS else \
             self.data[:self.test_row_count, :]
 
-        # print("-----Parsed " + self.type.value.__str__() + " Data-----")
-        # print("Total input rows demanded: " + number_of_inputs.__str__() + " Total input rows parsed: " +
-        #       (self.train_row_count + self.test_row_count).__str__())
-        # print("Test count: " + (self.test_values.shape[0]).__str__() + " Train count: " +
-        #       (self.train_values.shape[0]).__str__())
-        # print("Number of Attributes: " + self.number_of_columns.__str__())
+        print("-----Parsed " + self.type.value.__str__() + " Data-----")
+        print("Total input rows demanded: " + number_of_inputs.__str__() + " Total input rows parsed: " +
+              (self.train_row_count + self.test_row_count).__str__())
+        print("Test count: " + (self.test_values.shape[0]).__str__() + " Train count: " +
+              (self.train_values.shape[0]).__str__())
+        print("Number of Attributes: " + self.number_of_columns.__str__())
 
         self.test_x, self.test_y, self.train_x, self.train_y = self.split_x_y_sets()
 
         self.train_x = preprocessing.normalize(self.train_x)
         self.test_x = preprocessing.normalize(self.test_x)
-        self.test_y = self.normalize(self.test_y)
-        self.train_y = self.normalize(self.train_y)
+        enc = OneHotEncoder()
+        enc.fit(self.train_y)
+        self.test_y = enc.transform(self.test_y).toarray()
+        self.train_y = enc.transform(self.train_y).toarray()
 
         # print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
         #       + self.train_x.shape[1].__str__() + " columns.")
@@ -96,18 +99,11 @@ class DataClass:
         if self.type == DataType.DRUG_CONSUMPTION:
 
             return (self.test_values[:, :DRUG_DATA_PERSONALITY_END],
-                    self.test_values[:, DRUG_DATA_PERSONALITY_END:],
+                    self.test_values[:, DRUG_DATA_PERSONALITY_END:DRUG_DATA_PERSONALITY_END + 1],
                     self.train_values[:, :DRUG_DATA_PERSONALITY_END],
-                    self.train_values[:, DRUG_DATA_PERSONALITY_END:])
+                    self.train_values[:, DRUG_DATA_PERSONALITY_END:DRUG_DATA_PERSONALITY_END + 1])
         else:
             return (self.test_values[:, : - 1],
                     self.test_values[:, - 1:].reshape(-1, 1),
                     self.train_values[:, : - 1],
                     self.train_values[:, - 1:].reshape(-1, 1))
-
-    @staticmethod
-    def normalize(data: numpy.array):
-        min = numpy.min(data)
-        max = numpy.max(data)
-        #print('Min is', min, 'and max is', max)
-        return (1.0*(data - min)) / (1.0*(max - min))

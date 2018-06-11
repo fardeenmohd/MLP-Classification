@@ -1,5 +1,5 @@
 from data.data_class import DataClass, DataType
-from numpy import random, exp, dot
+from numpy import random, exp, dot, array, zeros_like
 
 
 class Layer:
@@ -47,30 +47,31 @@ class MultiLayerPerceptron:
         initial_error = target - self.layers[-1].input
         error = initial_error
         # Compute error on hidden layers
-        for i in range(len(self.layers) - 1, 1, -1):
+        for i in range(len(self.layers) - 1, 0, -1):
             delta = error * self.sigmoid_derivative(self.layers[i].input)
             error = delta.dot(self.weights[i - 1].T)
             grad = self.layers[i - 1].input.T.dot(delta)
             self.weights[i - 1] += learning_rate * grad
 
-        return (initial_error ** 2).sum()
-
     def train(self, epochs: int = 10, learning_rate: int = 1):
         self.print_config()
         for i in range(epochs):
-            self.propagate_forward(self.data_class.train_x[12 : 13, :])
-            print("Iteration " + i.__str__() + " error: " +
-                  self.propagate_backward(self.data_class.train_y[12 : 13, :], learning_rate).__str__())
-        print(self.data_class.train_y[12 : 13, :])
-        print(self.propagate_forward(self.data_class.train_x[12 : 13, :]))
+            self.propagate_forward(self.data_class.train_x)
+            self.propagate_backward(self.data_class.train_y, learning_rate)
+        classified_tr_output = self.classify(self.propagate_forward(self.data_class.train_x))
+        num_tr_matches = 0
+        for i in range(self.data_class.train_x.shape[0]):
+            if (classified_tr_output[i] == self.data_class.train_y[i]).all():
+                num_tr_matches += 1
+        print(num_tr_matches / self.data_class.train_row_count)
 
     def test(self):
-        output = self.propagate_forward(self.data_class.test_x)
-        expected = self.data_class.test_y
-
-        error = ((expected - output) ** 2).sum()
-        print("Error after testing with trained weights: " + error.__str__())
-        return error
+        classified_tr_output = self.classify(self.propagate_forward(self.data_class.test_x))
+        num_tr_matches = 0
+        for i in range(self.data_class.test_x.shape[0]):
+            if (classified_tr_output[i] == self.data_class.test_y[i]).all():
+                num_tr_matches += 1
+        print(num_tr_matches / self.data_class.test_row_count)
 
     @staticmethod
     def sigmoid(x):
@@ -82,3 +83,9 @@ class MultiLayerPerceptron:
     @staticmethod
     def create_weights(number_of_neurons, number_of_inputs_per_neuron):
         return 2 * random.random((number_of_neurons, number_of_inputs_per_neuron)) - 1
+
+    @staticmethod
+    def classify(result: array):
+        tmp = zeros_like(result)
+        tmp[range(len(result)), result.argmax(axis=1)] = 1
+        return tmp
