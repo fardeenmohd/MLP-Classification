@@ -11,10 +11,10 @@ if __name__ == "__main__":
                         help='WhiteWine, RedWine, DrugConsumption or PokerHands')
     parser.add_argument('-ds', '--DataSize', default=1500, type=int, help='Size of data')
     parser.add_argument('-l', '--HiddenLayers', default=2, type=int, help='Number of hidden layers')
-    parser.add_argument('-ls', '--HiddenLayerSize', default=100, type=int, help='Size of the hidden layer')
-    parser.add_argument('-tp', '--TrainingPercentage', default=0.5, type=int, help='Training Percentage')
+    parser.add_argument('-ls', '--HiddenLayerSize', default=20, type=int, help='Size of the hidden layer')
+    parser.add_argument('-tp', '--TrainingPercentage', default=0.8, type=int, help='Training Percentage')
     parser.add_argument('-i', '--Iterations', default=10, type=int, help='Number of epochs')
-    parser.add_argument('-lr', '--LearningRate', default=1, type=int, help='Learning rate')
+    parser.add_argument('-lr', '--LearningRate', default=0.5, type=float, help='Learning rate')
     parser.add_argument('-t', '--Test', default=False, type=bool,
                         help='Add this argument if you want to test hidden layer size')
     parser.add_argument('-str', '--Start', type=int, default=100, help='Starting point for testing')
@@ -63,4 +63,4 @@ if __name__ == "__main__":
                                    hidden_layer_size=arguments['HiddenLayerSize'], data_size=arguments['DataSize'],
                                    training_percentage=arguments['TrainingPercentage'])
         mlp.train(epochs=arguments['Iterations'], learning_rate=arguments['LearningRate'])
-        mlp.test()
+        #mlp.test()

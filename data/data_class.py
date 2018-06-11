@@ -1,6 +1,7 @@
 from enum import Enum
 import pandas as pd
 from sklearn import preprocessing
+import numpy
 
 DATA_PATH_TEST_POKER = "../resc/poker_hands/poker_hands_test.data"
 DATA_PATH_TRAIN_POKER = "../resc/poker_hands/poker_hands_train.data"
@@ -76,7 +77,9 @@ class DataClass:
         self.test_x, self.test_y, self.train_x, self.train_y = self.split_x_y_sets()
 
         self.train_x = preprocessing.normalize(self.train_x)
-        self.train_y = preprocessing.normalize(self.train_y)
+        self.test_x = preprocessing.normalize(self.test_x)
+        self.test_y = self.normalize(self.test_y)
+        self.train_y = self.normalize(self.train_y)
 
         # print("Train X has " + self.train_x.shape[0].__str__() + " rows and "
         #       + self.train_x.shape[1].__str__() + " columns.")
@@ -101,3 +104,10 @@ class DataClass:
                     self.test_values[:, - 1:].reshape(-1, 1),
                     self.train_values[:, : - 1],
                     self.train_values[:, - 1:].reshape(-1, 1))
+
+    @staticmethod
+    def normalize(data: numpy.array):
+        min = numpy.min(data)
+        max = numpy.max(data)
+        #print('Min is', min, 'and max is', max)
+        return (1.0*(data - min)) / (1.0*(max - min))

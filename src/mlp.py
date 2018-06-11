@@ -10,7 +10,7 @@ class Layer:
 
 class MultiLayerPerceptron:
     def __init__(self, data_type: DataType = DataType.POKER_HANDS, number_of_hidden_layers: int = 2,
-                 hidden_layer_size: int = 100, data_size: int = 1500, training_percentage: int = 0.5):
+                 hidden_layer_size: int = 20, data_size: int = 1500, training_percentage: int = 0.8):
         self.data_type = data_type
         self.number_of_hidden_layers = number_of_hidden_layers
         self.data_class = DataClass(data_type, data_size, training_percentage)
@@ -44,30 +44,25 @@ class MultiLayerPerceptron:
 
     def propagate_backward(self, target, learning_rate: int):
         # Compute error on output layer
-        deltas = []
-        error = target - self.layers[-1].input
-        delta = error * self.sigmoid_derivative(self.layers[-1].input)
-        deltas.append(delta)
-
+        initial_error = target - self.layers[-1].input
+        error = initial_error
         # Compute error on hidden layers
-        for i in range(len(self.layers) - 2, 0, -1):
-            delta = dot(deltas[0], self.weights[i].T) * self.sigmoid_derivative(self.layers[i].input)
-            deltas.insert(0, delta)
+        for i in range(len(self.layers) - 1, 1, -1):
+            delta = error * self.sigmoid_derivative(self.layers[i].input)
+            error = delta.dot(self.weights[i - 1].T)
+            grad = self.layers[i - 1].input.T.dot(delta)
+            self.weights[i - 1] += learning_rate * grad
 
-        # Update weights
-        for i in range(len(self.layers) - 1):
-            layer = self.layers[i].input
-            delta = deltas[i]
-            dw = dot(layer.T, delta)
-            self.weights[i] += learning_rate * dw
-
-        return (error ** 2).sum()
+        return (initial_error ** 2).sum()
 
     def train(self, epochs: int = 10, learning_rate: int = 1):
         self.print_config()
         for i in range(epochs):
-            self.propagate_forward(self.data_class.train_x)
-            self.propagate_backward(self.data_class.train_y, learning_rate)
+            self.propagate_forward(self.data_class.train_x[12 : 13, :])
+            print("Iteration " + i.__str__() + " error: " +
+                  self.propagate_backward(self.data_class.train_y[12 : 13, :], learning_rate).__str__())
+        print(self.data_class.train_y[12 : 13, :])
+        print(self.propagate_forward(self.data_class.train_x[12 : 13, :]))
 
     def test(self):
         output = self.propagate_forward(self.data_class.test_x)
