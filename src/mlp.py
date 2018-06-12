@@ -50,7 +50,7 @@ class MultiLayerPerceptron:
 
         return self.layers[-1].input
 
-    def propagate_backward(self, target, learning_rate: int):
+    def propagate_backward(self, target, learning_rate: float):
         # Compute error on output layer
         initial_error = target - self.layers[-1].input
         error = initial_error
@@ -61,7 +61,7 @@ class MultiLayerPerceptron:
             grad = self.layers[i - 1].input.T.dot(delta)
             self.weights[i - 1] += learning_rate * grad
 
-    def train(self, epochs: int = 10, learning_rate: int = 1):
+    def train(self, epochs: int = 10, learning_rate: float = 1):
         for i in range(epochs):
             self.propagate_forward(self.data_class.train_x)
             self.propagate_backward(self.data_class.train_y, learning_rate)
@@ -70,7 +70,7 @@ class MultiLayerPerceptron:
         for i in range(self.data_class.train_x.shape[0]):
             if (classified_tr_output[i] == self.data_class.train_y[i]).all():
                 num_train_matches += 1
-        success_rate = 100 * (num_train_matches / self.data_class.train_row_count)
+        success_rate = 100 * (num_train_matches / classified_tr_output.shape[0])
         print("Success rate of your model in training phase is: " + str(success_rate) + "%")
         return success_rate
 
@@ -80,7 +80,7 @@ class MultiLayerPerceptron:
         for i in range(self.data_class.test_x.shape[0]):
             if (classified_te_output[i] == self.data_class.test_y[i]).all():
                 num_test_matches += 1
-        success_rate = 100 * (num_test_matches / self.data_class.test_row_count)
+        success_rate = 100 * (num_test_matches / classified_te_output.shape[0])
         print("Success rate of your model in testing phase is: " + str(success_rate) + "%")
         return success_rate
 
